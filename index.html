@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sidebar Menu</title>
+    <!-- Bootstrap CSS v5.3.2 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        background-image: url("https://static.vecteezy.com/system/resources/previews/008/137/034/non_2x/female-doctor-in-medical-clothes-with-a-stethoscope-on-a-medical-white-background-side-view-healthcare-banner-copy-space-photo.jpeg");
+        background-size: cover;
+      }
+      .sidebar {
+        width: 370px;
+        height: 100vh;
+        background-color: transparent;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 40px;
+      }
+      .content {
+        margin-left: 370px;
+        padding: 20px;
+        width: calc(100% - 370px);
+        height: 100vh;
+        overflow-y: auto;
+        background-color: white;
+      }
+      .button_sidebar {
+        width: 100%;
+        color: #333;
+        background-color: #f8f9fa;
+        border: none;
+        border-radius: 18px;
+        padding: 10px 20px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+      }
+      .button_sidebar:hover {
+        background-color: #e2e6ea;
+        transform: translateY(-5px);
+      }
+      .timer {
+        font-size: 1.5rem;
+        margin: 10px 0;
+      }
+      .table th,
+      .table td {
+        text-align: left;
+      }
+      .modal-body {
+        padding: 2rem;
+      }
+      .form-label {
+        font-weight: bold;
+      }
+      .form-select {
+        border-radius: 5px;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+      .prescription {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+      }
+      .prescription-label {
+        font-weight: bold;
+      }
+      .btn-disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sidebar">
+      <button class="button_sidebar" id="btnBooking">
+        Incoming requests
+      </button>
+      <button class="button_sidebar" id="btnAccepted">
+        New-diagnose
+      </button>
+      <button class="button_sidebar" id="btnFinished">
+        My Profile
+      </button>
+    </div>
+    <div class="content" id="content">
+      <!-- Default Content for New-diagnose -->
+      <h1>New-diagnose</h1>
+      <button class="btn btn-primary" id="startButton">Start</button>
+      <div class="timer" id="timer">00:00:00</div>
+      <h2>Selected Appointments Details</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Address</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>John</td>
+            <td>Doe</td>
+            <td>30</td>
+            <td>Male</td>
+            <td>123 Elm St.</td>
+            <td>john.doe@example.com</td>
+            <td>(123) 456-7890</td>
+          </tr>
+          <!-- More rows as needed -->
+        </tbody>
+      </table>
+      <button
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#createDiagnosisModal"
+      >
+        Create Diagnosis
+      </button>
+    </div>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="createDiagnosisModal"
+      tabindex="-1"
+      aria-labelledby="createDiagnosisModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="createDiagnosisModalLabel">
+              Create Diagnosis
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="diagnosisForm">
+              <div class="mb-3">
+                <label for="diagnosisDescription" class="form-label">
+                  Diagnosis Description
+                </label>
+                <textarea
+                  class="form-control"
+                  id="diagnosisDescription"
+                  rows="3"
+                  placeholder="Enter diagnosis description"
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="hospitalizationRecommended" class="form-label">
+                  Hospitalization Recommended
+                </label>
+                <select class="form-select" id="hospitalizationRecommended">
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+              <div id="prescriptionsContainer"></div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                id="addPrescription"
+              >
+                Add Prescription
+              </button>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary" id="saveDiagnosis">
+              Save Diagnosis
+            </button>
+            <button type="button" class="btn btn-success" id="finished">
+              Finished
+            </button>
+            <button type="button" class="btn btn-danger" id="delete">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("btnBooking")
+        .addEventListener("click", function () {
+          document.getElementById("content").innerHTML =
+            "<h1>Booking Information</h1><p>Details about booking...</p>";
+        });
+
+      document
+        .getElementById("btnAccepted")
+        .addEventListener("click", function () {
+          document.getElementById("content").innerHTML =
+            "<h1>New-diagnose</h1>" +
+            '<button class="btn btn-primary" id="startButton">Start</button>' +
+            '<div class="timer" id="timer">00:00:00</div>' +
+            "<h2>Selected Appointments Details</h2>" +
+            '<table class="table">' +
+            "<thead><tr><th>First Name</th><th>Last Name</th><th>Age</th><th>Gender</th><th>Address</th><th>Email</th><th>Phone Number</th></tr></thead>" +
+            "<tbody><tr><td>John</td><td>Doe</td><td>30</td><td>Male</td><td>123 Elm St.</td><td>john.doe@example.com</td><td>(123) 456-7890</td></tr></tbody>" +
+            "</table>" +
+            '<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createDiagnosisModal">Create Diagnosis</button>';
+
+          // Initialize the timer
+          let startTime;
+          let updatedTime;
+          let difference;
+          let tInterval;
+          let running = false;
+          const timerDisplay = document.getElementById("timer");
+
+          document
+            .getElementById("startButton")
+            .addEventListener("click", function () {
+              if (!running) {
+                startTime = new Date().getTime();
+                tInterval = setInterval(updateTimer, 1);
+                running = true;
+              }
+            });
+
+          function updateTimer() {
+            updatedTime = new Date().getTime();
+            difference = updatedTime - startTime;
+            let hours = Math.floor(
+              (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+            );
+            let minutes = Math.floor(
+              (difference % (1000 * 60 * 60)) / (1000 * 60)
+            );
+            let seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            hours = hours < 10 ? "0" + hours : hours;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            timerDisplay.innerHTML = hours + ":" + minutes + ":" + seconds;
+          }
+        });
+
+      document
+        .getElementById("btnFinished")
+        .addEventListener("click", function () {
+          document.getElementById("content").innerHTML =
+            "<h1>My Profile</h1><p>Profile information...</p>";
+        });
+
+      document
+        .getElementById("addPrescription")
+        .addEventListener("click", function () {
+          const container = document.getElementById("prescriptionsContainer");
+          const prescriptionCount = container.children.length + 1;
+          const prescriptionDiv = document.createElement("div");
+          prescriptionDiv.className = "prescription";
+          prescriptionDiv.innerHTML = `<div class="mb-3">
+              <label class="prescription-label">Medicine ${prescriptionCount}</label>
+              <input type="text" class="form-control" placeholder="Medicine">
+            </div>
+            <div class="mb-3">
+              <label class="prescription-label">Dosage</label>
+              <input type="text" class="form-control" placeholder="Dosage">
+            </div>
+            <div class="mb-3">
+              <label class="prescription-label">Duration</label>
+              <input type="text" class="form-control" placeholder="Duration">
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-danger delete-prescription">Delete</button>
+              <button type="button" class="btn btn-primary save-prescription">Save</button>
+              <button type="button" class="btn btn-success finished-prescription">Finished</button>
+            </div>`;
+
+          container.appendChild(prescriptionDiv);
+
+          // Add event listener to the delete button
+          const deleteButtons = container.getElementsByClassName(
+            "delete-prescription"
+          );
+          Array.from(deleteButtons).forEach((button) => {
+            button.addEventListener("click", function () {
+              this.parentElement.parentElement.remove();
+            });
+          });
+
+          // Add event listener to the save button
+          const saveButtons = container.getElementsByClassName(
+            "save-prescription"
+          );
+          Array.from(saveButtons).forEach((button) => {
+            button.addEventListener("click", function () {
+              alert("Prescription saved.");
+            });
+          });
+
+          // Add event listener to the finished button
+          const finishedButtons = container.getElementsByClassName(
+            "finished-prescription"
+          );
+          Array.from(finishedButtons).forEach((button) => {
+            button.addEventListener("click", function () {
+              const prescriptionDiv = this.closest(".prescription");
+              const inputs = prescriptionDiv.querySelectorAll("input");
+              inputs.forEach((input) => (input.disabled = true));
+              prescriptionDiv
+                .querySelector(".save-prescription")
+                .classList.add("btn-disabled");
+              prescriptionDiv
+                .querySelector(".finished-prescription")
+                .classList.add("btn-disabled");
+            });
+          });
+        });
+
+      document
+        .getElementById("saveDiagnosis")
+        .addEventListener("click", function () {
+          const inputs = document.querySelectorAll(
+            "#diagnosisForm input, #diagnosisForm textarea, #diagnosisForm select"
+          );
+          inputs.forEach((input) => (input.disabled = true));
+          document
+            .getElementById("saveDiagnosis")
+            .classList.add("btn-disabled");
+        });
+
+      document
+        .getElementById("finished")
+        .addEventListener("click", function () {
+          alert("Diagnosis marked as finished.");
+        });
+
+      document.getElementById("delete").addEventListener("click", function () {
+        if (confirm("Are you sure you want to delete this diagnosis?")) {
+          // Implement deletion logic here
+          alert("Diagnosis deleted.");
+        }
+      });
+    </script>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
